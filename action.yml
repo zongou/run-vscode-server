@@ -1,4 +1,4 @@
-name: Run VS Code Server
+name: Run VSCode Server
 description: Runs a web version of Visual Studio Code to Debug GitHub Actions.
 author: zongou
 
