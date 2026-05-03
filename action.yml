@@ -12,7 +12,7 @@ inputs:
     required: true
     default: stable
   settings:
-    description: JSON string of VS Code settings
+    description: JSON string of vscode settings
     required: false
     default: |
       {
@@ -44,7 +44,7 @@ runs:
         *) echo "Unsupported architecture" && exit 1 ;;
         esac
 
-        echo "Downloading VS Code Cli"
+        echo "Downloading vscode Cli"
         # URL=https://code.visualstudio.com/sha/download?build=${{ inputs.quality }}&os=cli-${VSCODE_PLATFORM}-${VSCODE_ARCH}
         # URL=https://update.code.visualstudio.com/latest/cli-${VSCODE_PLATFORM}-${VSCODE_ARCH}/${{ inputs.quality }}
 
@@ -63,7 +63,7 @@ runs:
         macOS) curl -LkSs https://github.com/cloudflare/cloudflared/releases/download/${CLOUDFLARED_VERSION}/cloudflared-darwin-${CLOUDFLARED_ARCH}.tgz | gzip -d | tar -x ;;
         esac
 
-    - name: Verify VS Code Cli and cloudflared versions
+    - name: Verify vscode Cli and cloudflared versions
       shell: bash
       env:
         CODE: ${{ inputs.quality == 'insider' && 'code-insiders' || 'code' }}
@@ -71,7 +71,7 @@ runs:
         ${CODE} --version
         cloudflared --version
 
-    - name: Write VS Code settings
+    - name: Write vscode settings
       shell: bash
       env:
         USER_DATA_DIR_NAME: ${{ inputs.quality == 'insider' && '.vscode-server-insiders' || '.vscode-server' }}
@@ -80,7 +80,7 @@ runs:
         mkdir -p "${HOME}/${USER_DATA_DIR_NAME}/data/Machine"
         printf '%s\n' "${SETTINGS}" >"${HOME}/${USER_DATA_DIR_NAME}/data/Machine/settings.json"
 
-    - name: Run VS Code server
+    - name: Run vscode server
       shell: bash
       env:
         CODE: ${{ inputs.quality == 'insider' && 'code-insiders' || 'code' }}
