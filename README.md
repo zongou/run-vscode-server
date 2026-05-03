@@ -13,7 +13,7 @@ Runs a web version of Visual Studio Code to debug GitHub Actions.
 <!-- start usage -->
 
 ```yaml
-- uses: zongou/run-vscode-server@0.0.6
+- uses: zongou/run-vscode-server@0.0.4
   name: Run vscode server to debug
   if: ${{ failure() }}
   # with:
