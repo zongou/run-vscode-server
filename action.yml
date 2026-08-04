@@ -1,0 +1,89 @@
+name: Run VSCode Server
+description: Runs a web version of Visual Studio Code to Debug GitHub Actions.
+author: zongou
+
+branding:
+  icon: "code"
+  color: "blue"
+
+inputs:
+  quality:
+    description: stable or insider, default is stable
+    required: true
+    default: stable
+  settings:
+    description: JSON string of vscode settings
+    required: false
+    default: |
+      {
+          "workbench.colorTheme": "Default Dark Modern"
+      }
+
+runs:
+  using: composite
+
+  steps:
+    - name: Download resources
+      shell: bash
+      run: |
+        INSTALL_DIR="${{ runner.temp }}/vscode-server"
+        INSTALL_DIR_FORMATTED=${INSTALL_DIR}
+        if [[ "${{ runner.os }}" == "Windows" ]]; then
+          INSTALL_DIR_FORMATTED=$(cygpath -w ${INSTALL_DIR})
+        fi
+        echo "Using install dir ${INSTALL_DIR}"
+        echo ${INSTALL_DIR_FORMATTED} >> $GITHUB_PATH
+
+        rm -rf ${INSTALL_DIR}
+        mkdir -p ${INSTALL_DIR}
+        cd ${INSTALL_DIR}
+
+        case $(uname -m) in
+        aarch64 | arm64) VSCODE_ARCH=arm64 CLOUDFLARED_ARCH=arm64 ;;
+        x86_64) VSCODE_ARCH=x64 CLOUDFLARED_ARCH=amd64;;
+        *) echo "Unsupported architecture" && exit 1 ;;
+        esac
+
+        echo "Downloading vscode Cli"
+        # URL=https://code.visualstudio.com/sha/download?build=${{ inputs.quality }}&os=cli-${VSCODE_PLATFORM}-${VSCODE_ARCH}
+        # URL=https://update.code.visualstudio.com/latest/cli-${VSCODE_PLATFORM}-${VSCODE_ARCH}/${{ inputs.quality }}
+
+        case ${{ runner.os }} in
+        Linux) curl -LkSs "https://update.code.visualstudio.com/latest/cli-alpine-${VSCODE_ARCH}/${{ inputs.quality }}" | gzip -d | tar -x ;;
+        Windows) curl -LkSs "https://update.code.visualstudio.com/latest/cli-win32-${VSCODE_ARCH}/${{ inputs.quality }}" > downloaded_tmp && unzip -q downloaded_tmp && rm downloaded_tmp;;
+        macOS) curl -LkSs "https://update.code.visualstudio.com/latest/cli-darwin-${VSCODE_ARCH}/${{ inputs.quality }}" > downloaded_tmp && unzip -q downloaded_tmp && rm downloaded_tmp;;
+        esac
+
+        echo "Downloading cloudflared"
+        CLOUDFLARED_VERSION=$(curl -s -S -H "Authorization: Bearer ${{ github.token }}" https://api.github.com/repos/cloudflare/cloudflared/releases | jq -r .[0].tag_name)
+
+        case ${{ runner.os }} in
+        Linux) curl -LkSs https://github.com/cloudflare/cloudflared/releases/download/${CLOUDFLARED_VERSION}/cloudflared-linux-${CLOUDFLARED_ARCH} > cloudflared  && chmod +x cloudflared;;
+        Windows) curl -LkSs https://github.com/cloudflare/cloudflared/releases/download/${CLOUDFLARED_VERSION}/cloudflared-windows-${CLOUDFLARED_ARCH}.exe > cloudflared.exe ;;
+        macOS) curl -LkSs https://github.com/cloudflare/cloudflared/releases/download/${CLOUDFLARED_VERSION}/cloudflared-darwin-${CLOUDFLARED_ARCH}.tgz | gzip -d | tar -x ;;
+        esac
+
+    - name: Verify vscode Cli and cloudflared versions
+      shell: bash
+      env:
+        CODE: ${{ inputs.quality == 'insider' && 'code-insiders' || 'code' }}
+      run: |
+        ${CODE} --version
+        cloudflared --version
+
+    - name: Write vscode settings
+      shell: bash
+      env:
+        USER_DATA_DIR_NAME: ${{ inputs.quality == 'insider' && '.vscode-server-insiders' || '.vscode-server' }}
+        SETTINGS: ${{ inputs.settings }}
+      run: |
+        mkdir -p "${HOME}/${USER_DATA_DIR_NAME}/data/Machine"
+        printf '%s\n' "${SETTINGS}" >"${HOME}/${USER_DATA_DIR_NAME}/data/Machine/settings.json"
+
+    - name: Run vscode server
+      shell: bash
+      env:
+        CODE: ${{ inputs.quality == 'insider' && 'code-insiders' || 'code' }}
+      run: |
+        ${CODE} serve-web --host 0.0.0.0 --without-connection-token &
+        cloudflared tunnel --url localhost:8000 || true
