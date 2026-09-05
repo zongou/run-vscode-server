@@ -7,10 +7,6 @@ branding:
   color: "blue"
 
 inputs:
-  quality:
-    description: stable or insider, default is stable
-    required: true
-    default: stable
   settings:
     description: JSON string of vscode settings
     required: false
@@ -18,6 +14,10 @@ inputs:
       {
           "workbench.colorTheme": "Default Dark Modern"
       }
+  insider:
+    description: true for insider quality, false for stable quality, default is false
+    required: false
+    default: false
 
 runs:
   using: composite
@@ -100,8 +100,14 @@ runs:
         VSCODE_LOG: vscode.log
         CLOUDFLARED_LOG: cloudflared.log
       run: |
-        nohup ${CODE} serve-web --host 0.0.0.0 --port=${PORT} --without-connection-token >${VSCODE_LOG} 2>&1 &
+        if test -n ${{ secrects.VSCODE_SERVER_CONNECTION_TOKEN }}; then
+        nohup ${CODE} serve-web --host 0.0.0.0 --port=${PORT} --connection-token=${{ secrets.VSCODE_SERVER_CONNECTION_TOKEN }} >${VSCODE_LOG} 2>&1 &
         nohup cloudflared tunnel --url localhost:${PORT} > "${CLOUDFLARED_LOG}" 2>&1 &
+        else
+          echo Please set your secrets.VSCODE_SERVER_CONNECTION_TOKEN
+          exit 1
+        fi
+
         while true; do
             if cat "${CLOUDFLARED_LOG}" | grep -Eo "https://.+\.trycloudflare\.com"; then
                 break

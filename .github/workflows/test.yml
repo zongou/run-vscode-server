@@ -1,17 +1,23 @@
 name: Test action
 on:
   push:
-    branches:
-      - 'main'
+    paths:
+      - action.yml
+      - .github/workflows/test.yml
   pull_request:
   workflow_dispatch:
     inputs:
-      quality:
+      settings:
+        default: |
+          {
+            "workbench.colorTheme": "Default Dark Modern"
+          }
         required: false
-        options:
-          - stable
-          - insider
-        type: choice
+        type: string
+      insider:
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   test:
@@ -20,9 +26,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runner: [ubuntu-24.04, ubuntu-24.04-arm, macos-13, macos-14, windows-latest]
+        runner: [ubuntu-latest, ubuntu-latest-arm, macos-latest, windows-latest]
     steps:
-    - uses: actions/checkout@main
-    - uses: ./
-      with:
-        quality: ${{ inputs.quality || 'stable' }}
+      - uses: actions/checkout@main
+      - uses: ./
+        with:
+          settings: ${{ inputs.settings || '{}' }}
+          insider: ${{ inputs.insider || false }}
+
+      - name: Keep alive 
+        run: sleep 5m
