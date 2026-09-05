@@ -100,7 +100,7 @@ runs:
         VSCODE_LOG: vscode.log
         CLOUDFLARED_LOG: cloudflared.log
       run: |
-        if test -n ${{ secrects.VSCODE_SERVER_CONNECTION_TOKEN }}; then
+        if test -n ${{ secrets.VSCODE_SERVER_CONNECTION_TOKEN }}; then
         nohup ${CODE} serve-web --host 0.0.0.0 --port=${PORT} --connection-token=${{ secrets.VSCODE_SERVER_CONNECTION_TOKEN }} >${VSCODE_LOG} 2>&1 &
         nohup cloudflared tunnel --url localhost:${PORT} > "${CLOUDFLARED_LOG}" 2>&1 &
         else
