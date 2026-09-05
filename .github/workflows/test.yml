@@ -38,5 +38,6 @@ jobs:
           insider: ${{ inputs.insider || false }}
           connection-token: ${{ inputs.connection-token || secrets.VSCODE_SERVER_CONNECTION_TOKEN }}
 
-      - name: Keep alive 
+      - name: Keep alive
+        shell: bash
         run: sleep 5m
