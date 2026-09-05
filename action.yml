@@ -66,7 +66,8 @@ runs:
       working-directory: ${{ env.INSTALL_DIR }}
       shell: bash
       env:
-        CODE: ${{ inputs.quality == 'insider' && 'code-insiders' || 'code' }}
+        QUALITY: ${{ inputs.insider && 'insider' || 'stable' }}
+        CODE: ${{ inputs.insider && 'code-insiders' || 'code' }}
       run: |
         if ! command -v $CODE; then
           case $(uname -m) in
@@ -79,9 +80,9 @@ runs:
           # URL=https://update.code.visualstudio.com/latest/cli-${VSCODE_PLATFORM}-${VSCODE_ARCH}/${{ inputs.quality }}
 
           case ${{ runner.os }} in
-          Linux) curl -LkSs "https://update.code.visualstudio.com/latest/cli-alpine-${VSCODE_ARCH}/${{ inputs.quality }}" | gzip -d | tar -x ;;
-          Windows) curl -LkSs "https://update.code.visualstudio.com/latest/cli-win32-${VSCODE_ARCH}/${{ inputs.quality }}" > downloaded_tmp && unzip -q downloaded_tmp && rm downloaded_tmp;;
-          macOS) curl -LkSs "https://update.code.visualstudio.com/latest/cli-darwin-${VSCODE_ARCH}/${{ inputs.quality }}" > downloaded_tmp && unzip -q downloaded_tmp && rm downloaded_tmp;;
+          Linux) curl -LkSs "https://update.code.visualstudio.com/latest/cli-alpine-${VSCODE_ARCH}/$QUALITY" | gzip -d | tar -x ;;
+          Windows) curl -LkSs "https://update.code.visualstudio.com/latest/cli-win32-${VSCODE_ARCH}/$QUALITY" > downloaded_tmp && unzip -q downloaded_tmp && rm downloaded_tmp;;
+          macOS) curl -LkSs "https://update.code.visualstudio.com/latest/cli-darwin-${VSCODE_ARCH}/$QUALITY" > downloaded_tmp && unzip -q downloaded_tmp && rm downloaded_tmp;;
           esac
         fi
         $CODE --version
@@ -99,7 +100,7 @@ runs:
       working-directory: ${{ env.INSTALL_DIR }}
       shell: bash
       env:
-        CODE: ${{ inputs.quality == 'insider' && 'code-insiders' || 'code' }}
+        CODE: ${{ inputs.insider && 'code-insiders' || 'code' }}
         PORT: 8000
         VSCODE_LOG: vscode.log
         CLOUDFLARED_LOG: cloudflared.log
