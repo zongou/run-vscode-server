@@ -9,14 +9,14 @@ Useful for debugging GitHub Actions.
   with:
     # Connection token for vscode server, required, you should append `?tkn=your_token` to the output url to authenticate the server.
     connection-token: ${{ inputs.connection-token || secrets.VSCODE_SERVER_CONNECTION_TOKEN }}
-    # VSCode release quality, true for insider, false for stable, default is false, not required.
-    insider: false
-    # vscode settings, optional, default sets color theme to "Default Dark Modern"
-    settings:
-      default: |
-        {
-            "workbench.colorTheme": "Default Dark Modern"
-        }
+    # # VSCode release quality, true for insider, false for stable, default is false, not required.
+    # insider: false
+    # # vscode settings, optional, default sets color theme to "Default Dark Modern"
+    # settings:
+    #   default: |
+    #     {
+    #         "workbench.colorTheme": "Default Dark Modern"
+    #     }
 
 - name: Keep alive
   run: sleep 6h
