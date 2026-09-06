@@ -66,7 +66,7 @@ runs:
         fi
         cloudflared --version
 
-    - name: Get vscode-cli ${{inputs.insider && 'insider' || 'stable'}}
+    - name: Get vscode-cli ${{inputs.insider == true && 'insider' || 'stable'}}
       working-directory: ${{ env.INSTALL_DIR }}
       shell: bash
       env:
@@ -94,7 +94,7 @@ runs:
     - name: Write vscode configuration
       shell: bash
       env:
-        USER_DATA_DIR_NAME: ${{ inputs.insider && '.vscode-server-insiders' || '.vscode-server' }}
+        USER_DATA_DIR_NAME: ${{ inputs.insider == true && '.vscode-server-insiders' || '.vscode-server' }}
         SETTINGS: ${{ inputs.settings }}
       run: |
         mkdir -p "${HOME}/${USER_DATA_DIR_NAME}/data/Machine"
@@ -104,7 +104,7 @@ runs:
       working-directory: ${{ env.INSTALL_DIR }}
       shell: bash
       env:
-        CODE: ${{ inputs.insider && 'code-insiders' || 'code' }}
+        CODE: ${{ inputs.insider == true && 'code-insiders' || 'code' }}
         PORT: ${{ inputs.port }}
         VSCODE_LOG: vscode.log
         CLOUDFLARED_LOG: cloudflared.log
