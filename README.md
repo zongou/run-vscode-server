@@ -19,6 +19,7 @@ Useful for debugging GitHub Actions.
     #     }
 
 - name: Keep alive
+  shell: bash
   run: sleep 6h
 ```
 
