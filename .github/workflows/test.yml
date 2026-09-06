@@ -17,7 +17,7 @@ on:
           }
         required: false
         type: string
-      insiders:
+      insider:
         required: false
         type: boolean
         default: false
@@ -35,7 +35,7 @@ jobs:
       - uses: ./
         with:
           settings: ${{ inputs.settings || '{}' }}
-          insiders: ${{ inputs.insiders }}
+          insider: ${{ inputs.insider }}
           connection-token: ${{ inputs.connection-token || secrets.VSCODE_SERVER_CONNECTION_TOKEN }}
 
       - name: Keep alive
