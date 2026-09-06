@@ -70,8 +70,8 @@ runs:
       working-directory: ${{ env.INSTALL_DIR }}
       shell: bash
       env:
-        QUALITY: ${{ inputs.insider && 'insider' || 'stable' }}
-        CODE: ${{ inputs.insider && 'code-insiders' || 'code' }}
+        QUALITY: ${{ inputs.insider ==true && 'insider' || 'stable' }}
+        CODE: ${{ inputs.insider == true && 'code-insiders' || 'code' }}
       run: |
         if ! command -v $CODE >/dev/null 2>&1; then
           case $(uname -m) in
