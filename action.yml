@@ -22,6 +22,10 @@ inputs:
     description: true for insider quality, false for stable quality, default is false
     required: false
     default: false
+  port:
+    description: Port to run vscode server, default is 8000
+    required: false
+    default: 8000
 
 runs:
   using: composite
@@ -45,7 +49,7 @@ runs:
       working-directory: ${{ env.INSTALL_DIR }}
       shell: bash
       run: |
-        if ! command -v cloudflared; then
+        if ! command -v cloudflared >/dev/null 2>&1; then
           CLOUDFLARED_VERSION=$(curl -s -S -H "Authorization: Bearer ${{ github.token }}" https://api.github.com/repos/cloudflare/cloudflared/releases | jq -r .[0].tag_name)
 
           case $(uname -m) in
@@ -69,7 +73,7 @@ runs:
         QUALITY: ${{ inputs.insider && 'insider' || 'stable' }}
         CODE: ${{ inputs.insider && 'code-insiders' || 'code' }}
       run: |
-        if ! command -v $CODE; then
+        if ! command -v $CODE >/dev/null 2>&1; then
           case $(uname -m) in
           aarch64 | arm64) VSCODE_ARCH=arm64;;
           x86_64) VSCODE_ARCH=x64;;
@@ -101,18 +105,22 @@ runs:
       shell: bash
       env:
         CODE: ${{ inputs.insider && 'code-insiders' || 'code' }}
-        PORT: 8000
+        PORT: ${{ inputs.port }}
         VSCODE_LOG: vscode.log
         CLOUDFLARED_LOG: cloudflared.log
       run: |
         if test -n ${{ inputs.connection-token }}; then
           nohup ${CODE} serve-web --host 0.0.0.0 --port=${PORT} --connection-token=${{ inputs.connection-token }} >${VSCODE_LOG} 2>&1 &
           nohup cloudflared tunnel --url localhost:${PORT} > "${CLOUDFLARED_LOG}" 2>&1 &
+
+          while true; do
+              if cat "${CLOUDFLARED_LOG}" | grep -Eo "https://.+\.trycloudflare\.com"; then
+                  break
+              fi
+              sleep 1
+          done
+        else
+          echo connection-token not set
+          exit 1
         fi
 
-        while true; do
-            if cat "${CLOUDFLARED_LOG}" | grep -Eo "https://.+\.trycloudflare\.com"; then
-                break
-            fi
-            sleep 1
-        done
