@@ -94,7 +94,7 @@ runs:
     - name: Write vscode configuration
       shell: bash
       env:
-        USER_DATA_DIR_NAME: ${{ inputs.quality == 'insider' && '.vscode-server-insiders' || '.vscode-server' }}
+        USER_DATA_DIR_NAME: ${{ inputs.insider && '.vscode-server-insiders' || '.vscode-server' }}
         SETTINGS: ${{ inputs.settings }}
       run: |
         mkdir -p "${HOME}/${USER_DATA_DIR_NAME}/data/Machine"
