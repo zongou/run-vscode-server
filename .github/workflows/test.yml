@@ -7,6 +7,9 @@ on:
   pull_request:
   workflow_dispatch:
     inputs:
+      connection-token:
+        required: true
+        type: string
       settings:
         default: |
           {
@@ -18,9 +21,6 @@ on:
         required: false
         type: boolean
         default: false
-      connection-token:
-        required: true
-        type: string
 
 jobs:
   test:
@@ -35,7 +35,7 @@ jobs:
       - uses: ./
         with:
           settings: ${{ inputs.settings || '{}' }}
-          insider: ${{ inputs.insider || false }}
+          insider: ${{ inputs.insider }}
           connection-token: ${{ inputs.connection-token || secrets.VSCODE_SERVER_CONNECTION_TOKEN }}
 
       - name: Keep alive
