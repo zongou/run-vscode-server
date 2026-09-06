@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       connection-token:
-        required: true
+        required: false
         type: string
       settings:
         default: |

@@ -1,5 +1,5 @@
 name: Run VSCode Server
-description: Runs a web version of Visual Studio Code to Debug GitHub Actions.
+description: Runs a web version of Visual Studio Code
 author: zongou
 
 branding:
