@@ -18,7 +18,7 @@ inputs:
       {
           "workbench.colorTheme": "Default Dark Modern"
       }
-  insider:
+  insiders:
     description: true for insider quality, false for stable quality, default is false
     required: false
     default: false
@@ -70,8 +70,8 @@ runs:
       working-directory: ${{ env.INSTALL_DIR }}
       shell: bash
       env:
-        QUALITY: ${{ inputs.insider && 'insider' || 'stable' }}
-        CODE: ${{ inputs.insider && 'code-insiders' || 'code' }}
+        QUALITY: ${{ inputs.insiders && 'insider' || 'stable' }}
+        CODE: ${{ inputs.insiders && 'code-insiders' || 'code' }}
       run: |
         if ! command -v $CODE >/dev/null 2>&1; then
           case $(uname -m) in
@@ -94,7 +94,7 @@ runs:
     - name: Write vscode configuration
       shell: bash
       env:
-        USER_DATA_DIR_NAME: ${{ inputs.insider && '.vscode-server-insiders' || '.vscode-server' }}
+        USER_DATA_DIR_NAME: ${{ inputs.insiders && '.vscode-server-insiders' || '.vscode-server' }}
         SETTINGS: ${{ inputs.settings }}
       run: |
         mkdir -p "${HOME}/${USER_DATA_DIR_NAME}/data/Machine"
