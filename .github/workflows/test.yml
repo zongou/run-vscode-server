@@ -7,7 +7,7 @@ on:
   pull_request:
   workflow_dispatch:
     inputs:
-      connection-token:
+      vscode-server-token:
         required: false
         type: string
       settings:
@@ -36,7 +36,7 @@ jobs:
         with:
           settings: ${{ inputs.settings || '{}' }}
           insider: ${{ inputs.insider }}
-          connection-token: ${{ inputs.connection-token || secrets.VSCODE_SERVER_CONNECTION_TOKEN }}
+          token: ${{ inputs.vscode-server-token || secrets.VSCODE_SERVER_TOKEN }}
 
       - name: Keep alive
         shell: bash

@@ -7,7 +7,7 @@ branding:
   color: "blue"
 
 inputs:
-  connection-token:
+  token:
     description: Connection token for vscode server
     required: true
     default: ""
@@ -109,8 +109,8 @@ runs:
         VSCODE_LOG: vscode.log
         CLOUDFLARED_LOG: cloudflared.log
       run: |
-        if test -n ${{ inputs.connection-token }}; then
-          nohup ${CODE} serve-web --host 0.0.0.0 --port=${PORT} --connection-token=${{ inputs.connection-token }} >${VSCODE_LOG} 2>&1 &
+        if test -n ${{ inputs.token }}; then
+          nohup ${CODE} serve-web --host 0.0.0.0 --port=${PORT} --token=${{ inputs.token }} >${VSCODE_LOG} 2>&1 &
           nohup cloudflared tunnel --url localhost:${PORT} > "${CLOUDFLARED_LOG}" 2>&1 &
 
           while true; do
@@ -120,6 +120,6 @@ runs:
               sleep 1
           done
         else
-          echo connection-token not set
+          echo token not set
           exit 1
         fi
