@@ -7,7 +7,8 @@ Useful for debugging GitHub Actions.
 - uses: zongou/run-vscode-server@main
   name: Run vscode server
   with:
-    # Connection token for vscode server, required, you should append `?tkn=your_token` to the output url to authenticate the server.
+    # Connection token for vscode server, required
+    # After link is generated, append `?tkn=your_token` to the output url to authenticate.
     connection-token: ${{ inputs.connection-token || secrets.VSCODE_SERVER_CONNECTION_TOKEN }}
     # # Release quality of vscode server, true for insider, false for stable, default is false, not required.
     # insider: false
