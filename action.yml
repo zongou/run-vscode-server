@@ -22,6 +22,7 @@ inputs:
     description: true for insider quality, false for stable quality, default is false
     required: false
     default: false
+    type: boolean
   port:
     description: Port to run vscode server, default is 8000
     required: false
@@ -66,12 +67,12 @@ runs:
         fi
         cloudflared --version
 
-    - name: Get vscode-cli ${{inputs.insider == true && 'insider' || 'stable'}}
+    - name: Get vscode-cli ${{ inputs.insider && 'insider' || 'stable'}}
       working-directory: ${{ env.INSTALL_DIR }}
       shell: bash
       env:
-        QUALITY: ${{ inputs.insider ==true && 'insider' || 'stable' }}
-        CODE: ${{ inputs.insider == true && 'code-insiders' || 'code' }}
+        QUALITY: ${{ inputs.insider && 'insider' || 'stable' }}
+        CODE: ${{ inputs.insider && 'code-insiders' || 'code' }}
       run: |
         if ! command -v $CODE >/dev/null 2>&1; then
           case $(uname -m) in
@@ -94,7 +95,7 @@ runs:
     - name: Write vscode configuration
       shell: bash
       env:
-        USER_DATA_DIR_NAME: ${{ inputs.insider == true && '.vscode-server-insiders' || '.vscode-server' }}
+        USER_DATA_DIR_NAME: ${{ inputs.insider && '.vscode-server-insiders' || '.vscode-server' }}
         SETTINGS: ${{ inputs.settings }}
       run: |
         mkdir -p "${HOME}/${USER_DATA_DIR_NAME}/data/Machine"
@@ -104,7 +105,7 @@ runs:
       working-directory: ${{ env.INSTALL_DIR }}
       shell: bash
       env:
-        CODE: ${{ inputs.insider == true && 'code-insiders' || 'code' }}
+        CODE: ${{ inputs.insider && 'code-insiders' || 'code' }}
         PORT: ${{ inputs.port }}
         VSCODE_LOG: vscode.log
         CLOUDFLARED_LOG: cloudflared.log
