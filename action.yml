@@ -123,3 +123,13 @@ runs:
           echo token not set
           exit 1
         fi
+
+    - name: Print log
+      working-directory: ${{ env.INSTALL_DIR }}
+      shell: bash
+      env:
+        VSCODE_LOG: vscode.log
+        CLOUDFLARED_LOG: cloudflared.log
+      run: |
+        cat "${VSCODE_LOG}"
+        cat "${CLOUDFLARED_LOG}"
