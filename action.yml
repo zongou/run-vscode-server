@@ -124,4 +124,4 @@ runs:
       uses: actions/cache@v6.1.0
       with:
         path: ${{ env.VSCODE_DATA_DIR }}
-        key: ${{ hashFiles(env.VSCODE_DATA_DIR) }}
+        key: vsocde-data-${{ hashFiles(env.VSCODE_DATA_DIR) }}
