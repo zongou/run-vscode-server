@@ -34,10 +34,8 @@ jobs:
         shell: bash
         run: sleep 5m
 
-      
       - name: Cache Data
         uses: actions/cache@v6.1.0
         with:
-          path: 
-            ~/.vscode-server
+          path: ~/.vscode-server
           key: vsocde-server-data-${{ hashFiles('~/.vscode-server') }}
