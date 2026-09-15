@@ -11,10 +11,6 @@ inputs:
     description: Connection token for vscode server
     required: true
     default: ""
-  enableCache:
-    description: Whether to cache vscode data, default is false
-    required: false
-    default: false
   insider:
     description: true for insider quality, false for stable quality, default is false
     required: false
@@ -118,10 +114,3 @@ runs:
       run: |
         cat "${VSCODE_SERVER_LOG}"
         cat "${CLOUDFLARED_LOG}"
-
-    - name: Cache Data
-      if: inputs.enableCache == 'true'
-      uses: actions/cache@v6.1.0
-      with:
-        path: ${{ env.VSCODE_SERVER_DATADIR }}
-        key: vsocde-server-data-${{ hashFiles(env.VSCODE_SERVER_DATADIR) }}
