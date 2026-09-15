@@ -43,8 +43,8 @@ runs:
         echo INSTALL_DIR=${INSTALL_DIR_FORMATTED} >> $GITHUB_ENV
 
         echo "CODE=${{ inputs.insider == 'true' && 'code-insiders' || 'code' }}" >> $GITHUB_ENV
-        echo "VSCODE_DATA_DIR=${HOME}/${{ inputs.insider == 'true' && '.vscode-server-insiders' || '.vscode-server' }}" >> $GITHUB_ENV
-        echo "VSCODE_LOG=${INSTALL_DIR}/vscode.log" >> $GITHUB_ENV
+        echo "VSCODE_SERVER_DATADIR=${HOME}/${{ inputs.insider == 'true' && '.vscode-server-insiders' || '.vscode-server' }}" >> $GITHUB_ENV
+        echo "VSCODE_SERVER_LOG=${INSTALL_DIR}/vscode.log" >> $GITHUB_ENV
         echo "CLOUDFLARED_LOG=${INSTALL_DIR}/cloudflared.log" >> $GITHUB_ENV
 
     - name: Get cloudflared
@@ -99,7 +99,7 @@ runs:
         PORT: ${{ inputs.port || 8000 }}
       run: |
         if test -n ${{ inputs.token }}; then
-          nohup ${CODE} serve-web --host 0.0.0.0 --port=${PORT} --connection-token=${{ inputs.token }} >${VSCODE_LOG} 2>&1 &
+          nohup ${CODE} serve-web --host 0.0.0.0 --port=${PORT} --connection-token=${{ inputs.token }} >${VSCODE_SERVER_LOG} 2>&1 &
           nohup cloudflared tunnel --url localhost:${PORT} > "${CLOUDFLARED_LOG}" 2>&1 &
 
           while true; do
@@ -116,12 +116,12 @@ runs:
     - name: Print log
       shell: bash
       run: |
-        cat "${VSCODE_LOG}"
+        cat "${VSCODE_SERVER_LOG}"
         cat "${CLOUDFLARED_LOG}"
 
     - name: Cache Data
       if: inputs.enableCache == 'true'
       uses: actions/cache@v6.1.0
       with:
-        path: ${{ env.VSCODE_DATA_DIR }}
-        key: vsocde-data-${{ hashFiles(env.VSCODE_DATA_DIR) }}
+        path: ${{ env.VSCODE_SERVER_DATADIR }}
+        key: vsocde-server-data-${{ hashFiles(env.VSCODE_SERVER_DATADIR) }}
