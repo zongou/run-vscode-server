@@ -10,7 +10,7 @@ on:
       vscodeServerToken:
         required: false
         type: string
-      cacheData:
+      enableCache:
         required: false
         type: boolean
         default: false
@@ -32,7 +32,7 @@ jobs:
       - uses: ./
         with:
           token: ${{ inputs.vscodeServerToken || secrets.VSCODE_SERVER_TOKEN }}
-          cacheData: ${{ inputs.cacheData }}
+          enableCache: ${{ inputs.enableCache }}
           insider: ${{ inputs.insider }}
 
       - name: Keep alive

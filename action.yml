@@ -11,7 +11,7 @@ inputs:
     description: Connection token for vscode server
     required: true
     default: ""
-  cacheData:
+  enableCache:
     description: Whether to cache vscode data, default is false
     required: false
     default: false
@@ -120,7 +120,7 @@ runs:
         cat "${CLOUDFLARED_LOG}"
 
     - name: Cache Data
-      if: inputs.cacheData == 'true'
+      if: inputs.enableCache == 'true'
       uses: actions/cache@v6.1.0
       with:
         path: ${{ env.VSCODE_DATA_DIR }}
