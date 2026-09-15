@@ -43,7 +43,7 @@ runs:
         echo INSTALL_DIR=${INSTALL_DIR_FORMATTED} >> $GITHUB_ENV
 
         echo "CODE=${{ inputs.insider == 'true' && 'code-insiders' || 'code' }}" >> $GITHUB_ENV
-        echo "VSCODE_DATA_DIR=${HOME}/${{ inputs.insider == 'true' && '.vscode-server-insiders' || '.vscode-server' }}/data/Machine" >> $GITHUB_ENV
+        echo "VSCODE_DATA_DIR=${HOME}/${{ inputs.insider == 'true' && '.vscode-server-insiders' || '.vscode-server' }}" >> $GITHUB_ENV
         echo "VSCODE_LOG=${INSTALL_DIR}/vscode.log" >> $GITHUB_ENV
         echo "CLOUDFLARED_LOG=${INSTALL_DIR}/cloudflared.log" >> $GITHUB_ENV
 
