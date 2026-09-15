@@ -11,13 +11,10 @@ inputs:
     description: Connection token for vscode server
     required: true
     default: ""
-  settings:
-    description: JSON string of vscode settings
+  cacheData:
+    description: Whether to cache vscode data, default is false
     required: false
-    default: |
-      {
-          "workbench.colorTheme": "Default Dark Modern"
-      }
+    default: false
   insider:
     description: true for insider quality, false for stable quality, default is false
     required: false
@@ -45,6 +42,11 @@ runs:
         echo ${INSTALL_DIR_FORMATTED} >> $GITHUB_PATH
         echo INSTALL_DIR=${INSTALL_DIR_FORMATTED} >> $GITHUB_ENV
 
+        echo "CODE=${{ inputs.insider == 'true' && 'code-insiders' || 'code' }}" >> $GITHUB_ENV
+        echo "VSCODE_DATA_DIR=${HOME}/${{ inputs.insider == 'true' && '.vscode-server-insiders' || '.vscode-server' }}/data/Machine" >> $GITHUB_ENV
+        echo "VSCODE_LOG=${INSTALL_DIR}/vscode.log" >> $GITHUB_ENV
+        echo "CLOUDFLARED_LOG=${INSTALL_DIR}/cloudflared.log" >> $GITHUB_ENV
+
     - name: Get cloudflared
       working-directory: ${{ env.INSTALL_DIR }}
       shell: bash
@@ -71,7 +73,6 @@ runs:
       shell: bash
       env:
         QUALITY: ${{ inputs.insider == 'true' && 'insider' || 'stable' }}
-        CODE: ${{ inputs.insider == 'true' && 'code-insiders' || 'code' }}
       run: |
         if ! command -v $CODE >/dev/null 2>&1; then
           case $(uname -m) in
@@ -91,23 +92,11 @@ runs:
         fi
         $CODE --version
 
-    - name: Write vscode configuration
-      shell: bash
-      env:
-        USER_DATA_DIR_NAME: ${{ inputs.insider == 'true' && '.vscode-server-insiders' || '.vscode-server' }}
-        SETTINGS: ${{ inputs.settings }}
-      run: |
-        mkdir -p "${HOME}/${USER_DATA_DIR_NAME}/data/Machine"
-        printf '%s\n' "${SETTINGS}" >"${HOME}/${USER_DATA_DIR_NAME}/data/Machine/settings.json"
-
     - name: Run vscode server
       working-directory: ${{ env.INSTALL_DIR }}
       shell: bash
       env:
-        CODE: ${{ inputs.insider == 'true' && 'code-insiders' || 'code' }}
-        PORT: ${{ inputs.port }}
-        VSCODE_LOG: vscode.log
-        CLOUDFLARED_LOG: cloudflared.log
+        PORT: ${{ inputs.port || 8000 }}
       run: |
         if test -n ${{ inputs.token }}; then
           nohup ${CODE} serve-web --host 0.0.0.0 --port=${PORT} --connection-token=${{ inputs.token }} >${VSCODE_LOG} 2>&1 &
@@ -125,11 +114,14 @@ runs:
         fi
 
     - name: Print log
-      working-directory: ${{ env.INSTALL_DIR }}
       shell: bash
-      env:
-        VSCODE_LOG: vscode.log
-        CLOUDFLARED_LOG: cloudflared.log
       run: |
         cat "${VSCODE_LOG}"
         cat "${CLOUDFLARED_LOG}"
+
+    - name: Cache Data
+      if: inputs.cacheData == 'true'
+      uses: actions/cache@v7
+      with:
+        path: ${{ env.VSCODE_DATA_DIR }}
+        key: ${{ hashFiles(env.VSCODE_DATA_DIR) }}

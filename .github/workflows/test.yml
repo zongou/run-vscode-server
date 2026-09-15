@@ -7,16 +7,13 @@ on:
   pull_request:
   workflow_dispatch:
     inputs:
-      vscode-server-token:
+      vscodeServerToken:
         required: false
         type: string
-      settings:
-        default: |
-          {
-            "workbench.colorTheme": "Default Dark Modern"
-          }
+      cacheData:
         required: false
-        type: string
+        type: boolean
+        default: false
       insider:
         required: false
         type: boolean
@@ -34,9 +31,9 @@ jobs:
       - uses: actions/checkout@main
       - uses: ./
         with:
-          settings: ${{ inputs.settings || '{}' }}
+          token: ${{ inputs.vscodeServerToken || secrets.VSCODE_SERVER_TOKEN }}
+          cacheData: ${{ inputs.cacheData }}
           insider: ${{ inputs.insider }}
-          token: ${{ inputs.vscode-server-token || secrets.VSCODE_SERVER_TOKEN }}
 
       - name: Keep alive
         shell: bash
