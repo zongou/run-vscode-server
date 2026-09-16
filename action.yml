@@ -99,7 +99,7 @@ runs:
           nohup cloudflared tunnel --url localhost:${PORT} > "${CLOUDFLARED_LOG}" 2>&1 &
 
           while true; do
-              if cat "${CLOUDFLARED_LOG}" | grep -Eo "https://.+\.trycloudflare\.com"; then
+              if cat "${CLOUDFLARED_LOG}" | grep -Eo 'https://\w+(-\w+)+\.trycloudflare\.com'; then
                   break
               fi
               sleep 1
