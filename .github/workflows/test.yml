@@ -32,7 +32,7 @@ jobs:
 
       - name: Keep alive
         shell: bash
-        run: sleep 5m
+        run: sleep 5m || true
 
       - name: Cache Data
         uses: actions/cache@v6.1.0
